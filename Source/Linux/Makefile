@@ -1,5 +1,5 @@
 ###############################################################################
-#                                    Voxel Demo Makefile [Linux x86] Ver. 1.0 #
+#                                  Voxel Demo Makefile [Linux x86] Ver. 1.0 #
 ###############################################################################
 ifndef TOPDIR
 export TOPDIR		:= $(shell cd ../../ && pwd)
@@ -9,7 +9,7 @@ export OBJSDIR		= $(TOPDIR)/Obj/$(PLATFORM)/$(ARCH)/$(BITSIZE)/GCC/$(GCCVER)/$(B
 endif
 SOURCEDIR	= Source ../Common/Source
 
-PROJECT := Voxel
+PROJECT := VoxelDemo
 TARGET := $(PROJECT)
 OUTFILE	=	$(TARGETDIR)/$(TARGET)_$(GCCVER)
 
@@ -59,18 +59,18 @@ endif
 
 CPP = g++
 
-CPPFLAGS	=	-c -m$(BITSIZE) -DVOX_BUILD_$(BUILD_DEF) \
-				-DVOX_PLATFORM_$(BUILD_PLATFORM) \
-				-DVOX_PLATFORM_$(BUILD_PLATFORM)_$(BUILD_ARCH) \
-				-DVOX_PLATFORM_$(BUILD_PLATFORM)_$(BUILD_ARCH)_$(BITSIZE) \
-				-DVOX_BITSIZE_$(BITSIZE) -DVOX_ARCH_$(BUILD_ARCH) \
-				-DVOX_WINDOWSYSTEM_X11 \
+CPPFLAGS	=	-c -m$(BITSIZE) -DZED_BUILD_$(BUILD_DEF) \
+				-DZED_PLATFORM_$(BUILD_PLATFORM) \
+				-DZED_PLATFORM_$(BUILD_PLATFORM)_$(BUILD_ARCH) \
+				-DZED_PLATFORM_$(BUILD_PLATFORM)_$(BUILD_ARCH)_$(BITSIZE) \
+				-DZED_BITSIZE_$(BITSIZE) -DZED_ARCH_$(BUILD_ARCH) \
+				-DZED_WINDOWSYSTEM_X11 \
 				-I$(TOPSRC)/Linux/Headers -I$(TOPSRC)/Common/Headers
 SYSIPATH	=
-INCPATH		=	
+INCPATH		=	-I$(ZEDSDK)/include/Linux
 SYSLPATH	=	
-LIBPATH		=	
-SYSLIBS		=	-lSDL -lGL -pthread
+LIBPATH		=	-L$(ZEDSDK)/lib/Linux/$(ARCH)/$(BITSIZE)
+SYSLIBS		=	-lX11 -lGL -lXrandr -lXi -lrt -pthread
 LINKFLAGS	=
 
 ##### Debug #######
@@ -79,7 +79,7 @@ debug:		BUILD_TYPE	= debug
 debug:		BUILD_DEF	= DEBUG
 debug:		TARGET := $(TARGET)D
 debug:		CPPFLAGS += -g -ggdb -Wall -D_DEBUG $(CPPFLAGS_EXT)
-debug:		LIBS =
+debug:		LIBS = -lZEDRendererD -lZEDArithmeticD -lZEDSystemD
 debug:		$(TARGET)
 
 ##### Release #####
@@ -88,7 +88,7 @@ release:	BUILD_TYPE	= release
 release:	BUILD_DEF	= RELEASE
 release:	TARGET := $(TARGET)
 release:	CPPFLAGS += -O3 $(CPPFLAGS_EXT)
-release:	LIBS =
+release:	LIBS = -lZEDRenderer -lZEDArithmetic -lZEDSystem
 release:	LINKFLAGS += -Wl,-S
 release:	$(TARGET)
 
@@ -98,7 +98,7 @@ profile:	BUILD_TYPE	= profile
 profile:	BUILD_DEF	= PROFILE
 profile:	TARGET := $(TARGET)P
 profile:	CPPFLAGS += -O3 -g -ggdb -Wall -D_DEBUG $(CPPFLAGS_EXT)
-profile:	LIBS =
+profile:	LIBS = -lZEDRendererP -lZEDArithmeticP -lZEDSystemP
 profile:	$(TARGET)
 
 ##### Build the object files while not in the Obj directory ###################
@@ -151,7 +151,7 @@ $(TARGET): $(OBJS)
 		COLOURSUPPORT=`tput colors`;\
 		if [ $$COLOURSUPPORT -gt -1 ]; then\
 			cat lmsgs | sed ''/error/s//`printf "\033[31merror\033[0m"`/'' > lmsgs;\
-			cat lmsgs | sed ''/warning/s//`printf "\034[31mwarning\033[0m"`/'' > lmsgs;\
+			cat lmsgs | sed ''/warning/s//`printf "\033[34mwarning\033[0m"`/'' > lmsgs;\
 		fi;\
 	fi;\
 	if [[ $$RETVAL == 0 ]]; then\
